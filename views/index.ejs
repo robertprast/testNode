@@ -1,33 +1,53 @@
-<input id="m" autocomplete="off" /><button id="button">Send</button>
+<head>
+    <% include ./helperScripts/goodscripts.ejs %>
+    <% include ./helperScripts/mainGame.ejs %>
+</head>
 
-<script src="/socket.io/socket.io.js"></script>
-<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-<script>
-    $(function () {
-        var socket = io();
-        $('button').click(function () {
-            socket.emit('chat message', $('#m').val());
-            $('#m').val('');
-        });
-
-        socket.on('getTimer', (event) => {
-            $('#countDownValue').text(event);
-            console.log(parseInt(event) + 2);
-            $('body').append('<input id="highScore2" autocomplete="off"/><button id="highScore" onclick="sayWEI()">Send</button>')
-            console.log($('highScore'));
-        });
-    });
-    function sayWEI() {
-        console.log("WEI");
-    }
-
-</script>
+<!--#eb9534; ORANGE  -->
 
 <body>
-    <div class="container">
-        <h3>Countdown</h3>
-        <h2 id="countDownValue">
-        </h2>
-    </div>
+    <% include ./helperScripts/navbar.ejs %>
 
+    <div class="a" style="width: 50px;
+    height:50px;
+    position:fixed;">
+        <img src="https://i.ibb.co/sK46jp2/14aff4d8d807393ac51aec43e8e9807.png" height="100px" width="100px"
+            alt="dfrobot" border="0">
+    </div>
+    <div class="b" style="width: 50px;
+    height:50px;
+    position:fixed;">
+        <img
+            src="https://www.bettshow.com/__media/libraries/bett-suppliers-list/2FBC0C8E-5056-B779-24B31C573D8602AE-logo.jpg.png">
+    </div>
+    <div id="winnerAlert">
+
+    </div>
+    <div class="container">
+        <br>
+        <div class="row">
+            <% cardColors=["bg-primary","bg-success","bg-danger","bg-secondary"] %>
+            <% realColors=["BLUE","GREEN","RED","GREY"] %>
+            <% for (var i =0; i <2;  i++ ) { %>
+            <div class="col-sm" style="width: 50%;padding-left: 5px;padding-right: 5px;">
+                <div class="card text-white <%-cardColors[i]%> mb-2" style="vertical-align: middle; height: 250px;"
+                    id=<%-realColors[i]%> onclick="sendColor(id);">
+                    <div class="card-img-overlay" style="text-align: center;">
+                        <div style="height: 90px;"></div>
+                        <h5 class="card-title">DFRobot Says</h5>
+                        <h5 class="card-title"><%= realColors[i]%></h5>
+                    </div>
+                </div>
+                <div class="card text-white <%-cardColors[i+2]%> mb-2" style="height: 250px;" id=<%-realColors[i+2]%>
+                    onclick="sendColor(id);">
+                    <div class="card-img-overlay" style="text-align: center; padding: 0px;">
+                        <div style="height: 90px;"></div>
+                        <h5 class="card-title">DFRobot Says</h5>
+                        <h5 class="card-title"><%= realColors[i+2]%></h5>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+        </div>
+    </div>
 </body>

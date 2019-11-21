@@ -1,0 +1,93 @@
+<script type="text/javascript" charset="utf-8">
+    var socket = '';
+    var id = '';
+    var pressedColor = [];
+    var lengthOfGame = 0;
+
+    function sendColor(color) {
+        //console.log(color)
+        pressedColor.push(color);
+    }
+
+
+    function animateDiv($target) {
+        var newPos = [Math.floor(Math.random() * window.innerHeight), Math.floor(Math.random() * window.innerWidth)];
+        var oldPos = $target.offset();
+        var speed = calcSpeed([oldPos.top, oldPos.left], newPos);
+        //console.log(speed)
+
+        $target.animate({
+            top: newPos[0],
+            left: newPos[1]
+        }, speed, function () {
+            animateDiv($target);
+        });
+
+    };
+
+    function calcSpeed(prev, next) {
+        var x = Math.abs(prev[1] - next[1]);
+        var y = Math.abs(prev[0] - next[0]);
+        var greatest = x > y ? x : y;
+        var speed = Math.ceil(greatest / .3);
+        return speed;
+    }
+
+    function submitHighScore() {
+        socket.emit('userHighScoreSubmit', { uuid: id, data: $("#intials").val() })
+    }
+
+    $(document).ready(function () {
+
+        animateDiv($('.a'));
+        animateDiv($('.b'));
+
+        socket = io.connect('http://' + document.domain + ':' + location.port);
+        socket.on("send colors to server", function (msg) {
+            //console.log(pressedColor)
+            //console.log(lengthOfGame)
+            //console.log(pressedColor.length == lengthOfGame)
+            if (pressedColor.length == lengthOfGame || 1 == 1) {
+                if (socket) {
+                    console.log("SENDING DATA: " + JSON.stringify({ uuid: id, data: pressedColor }))
+                    socket.emit("colorArray", { uuid: id, data: pressedColor });
+                }
+            }
+        });
+
+        socket.on("connect_response", function (msg) {
+            //console.log("response from server")
+            //console.log(msg)
+            id = msg['id']
+        });
+
+        socket.on("recvWinFromServer", function (msg) {
+            //console.log("RECEIVED THIS FROM SERVER: " + JSON.stringify(msg));
+            $('#winnerAlert').empty()
+            $('#winnerAlert').append(`  <div class="jumbotron" style="text-align:center">
+        <h1 class="display-4">Congrats you won!</h1>
+        <p>You set a new record! Enter your intials to be added to the highscores!</p>
+
+        <form class="form centered">
+            <div class="form-group">
+                <input type="text" style="text-align:center;width: 33%;margin-left:33%;margin-right:33%;" class="form-control" id="intials">
+                                                        </div>
+                <button type="submit" class="btn btn-primary mb-2" onclick="submitHighScore()">Submit</button>
+                                                    </form>
+                                                
+                                                </div>
+        `);
+
+
+        });
+
+        socket.on("start game", function (msg) {
+            //console.log("Game started");
+            //console.log(msg["lengthOfGame"]);
+            lengthOfGame = msg["lengthOfGame"];
+            //console.log(lengthOfGame)
+            pressedColor = [];
+        });
+    });
+
+</script>
