@@ -1,0 +1,33 @@
+<input id="m" autocomplete="off" /><button id="button">Send</button>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<script>
+    $(function () {
+        var socket = io();
+        $('button').click(function () {
+            socket.emit('chat message', $('#m').val());
+            $('#m').val('');
+        });
+
+        socket.on('getTimer', (event) => {
+            $('#countDownValue').text(event);
+            console.log(parseInt(event) + 2);
+            $('body').append('<input id="highScore2" autocomplete="off"/><button id="highScore" onclick="sayWEI()">Send</button>')
+            console.log($('highScore'));
+        });
+    });
+    function sayWEI() {
+        console.log("WEI");
+    }
+
+</script>
+
+<body>
+    <div class="container">
+        <h3>Countdown</h3>
+        <h2 id="countDownValue">
+        </h2>
+    </div>
+
+</body>
