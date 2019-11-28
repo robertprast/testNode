@@ -1,53 +1,132 @@
 <head>
     <% include ./helperScripts/goodscripts.ejs %>
-    <% include ./helperScripts/mainGame.ejs %>
+    <% include ./helperScripts/mainClientJS.ejs %>
 </head>
 
 <!--#eb9534; ORANGE  -->
 
-<body>
+<body style="background-color:rgba(255, 136, 0, 0.788)">
     <% include ./helperScripts/navbar.ejs %>
+    <script>
+        var allState = true
+        function getSenIDs() {
+            return "<%= Object.keys(sensorData) %>".split(",")
+        }
+
+        function toggleAll() {
+            // if (allState) {
+            //     $('.dataRow').hide("slow");
+            // }
+            // else {
+            //     for (var i = 0; i < 4; i++) {
+
+            //         $(".cat" + i.toString()).show("slow");
+            //     }
+            //     $('.dataRow').show("slow");
+
+            // }
+            // allState = !allState;'
+            for (var i = 0; i <= 4; i++) {
+                $(".cat" + i.toString()).show("slow");
+            }
+            // $('.dataRow').hide();
+            $('.dataRow').show("slow");
+        }
+
+        function toggleCat(id) {
+            for (var i = 0; i <= 4; i++) {
+                if ("cat" + i.toString() === id) {
+                    $(".cat" + i.toString()).show("slow");
+                }
+                else {
+                    console.log("here")
+                    $(".cat" + i.toString()).hide("slow");
+                }
+            }
+        }
+
+    </script>
 
     <div class="a" style="width: 50px;
     height:50px;
     position:fixed;">
         <img src="https://i.ibb.co/sK46jp2/14aff4d8d807393ac51aec43e8e9807.png" height="100px" width="100px"
-            alt="dfrobot" border="0">
-    </div>
-    <div class="b" style="width: 50px;
-    height:50px;
-    position:fixed;">
-        <img
-            src="https://www.bettshow.com/__media/libraries/bett-suppliers-list/2FBC0C8E-5056-B779-24B31C573D8602AE-logo.jpg.png">
-    </div>
-    <div id="winnerAlert">
-
+            alt="dfrobot">
     </div>
     <div class="container">
-        <br>
-        <div class="row">
-            <% cardColors=["bg-primary","bg-success","bg-danger","bg-secondary"] %>
-            <% realColors=["BLUE","GREEN","RED","GREY"] %>
-            <% for (var i =0; i <2;  i++ ) { %>
-            <div class="col-sm" style="width: 50%;padding-left: 5px;padding-right: 5px;">
-                <div class="card text-white <%-cardColors[i]%> mb-2" style="vertical-align: middle; height: 250px;"
-                    id=<%-realColors[i]%> onclick="sendColor(id);">
-                    <div class="card-img-overlay" style="text-align: center;">
-                        <div style="height: 90px;"></div>
-                        <h5 class="card-title">DFRobot Says</h5>
-                        <h5 class="card-title"><%= realColors[i]%></h5>
-                    </div>
-                </div>
-                <div class="card text-white <%-cardColors[i+2]%> mb-2" style="height: 250px;" id=<%-realColors[i+2]%>
-                    onclick="sendColor(id);">
-                    <div class="card-img-overlay" style="text-align: center; padding: 0px;">
-                        <div style="height: 90px;"></div>
-                        <h5 class="card-title">DFRobot Says</h5>
-                        <h5 class="card-title"><%= realColors[i+2]%></h5>
-                    </div>
+        <div class="specialContainer">
+            <div class="jumbotron jumboSpecial shadow justify-content-center" style="padding: 0%;display:flex;">
+                <div class="container">
+                    <h1 class="display">DFRobot</h1>
+                    <p class="lead">We do cool things with sensors and put them on the internet. Blah blah blah blah
+                        blah
+                    </p>
                 </div>
             </div>
-            <% } %>
         </div>
-    </div>
+
+        <div class="row justify-content-center" style="display:flex;">
+            <button style="flex:1" type="button" class="btn btn-primary shadow-sm border border-dark"
+                onclick="toggleAll();">All</button>
+            <button style="flex:1" type="button" class="btn btn-secondary shadow-sm border border-dark"
+                onclick="toggleCat('cat1')">Temp Sensors</button>
+            <button style="flex:1" type="button" class="btn btn-success shadow-sm border border-dark"
+                onclick="toggleCat('cat2')">Another
+                Category</button>
+            <button style="flex:1" type="button" class="btn btn-danger shadow-sm border border-dark"
+                onclick="toggleCat('cat3')">3rd
+                Categroy</button>
+        </div>
+        <br>
+        <div class="row dataRow justify-content-center">
+            <% 
+            cardColors=["bg-primary","bg-info","bg-danger","bg-secondary","bg-primary","bg-info","bg-danger","bg-secondary"];
+            sensorID=Object.keys(sensorData) 
+            %>
+
+            <% for (var i =0; i <sensorID.length+4;  i=i+2 ) { %>
+            <% if(i>=sensorID.length){
+                break
+            }%>
+            <div class="col-sm">
+                <div
+                    class="card text-white <%= cardColors[i] %> mb-3 <%= sensorID[i]%> <%= ' cat'+sensorData[sensorID[i]]['cat']%> shadow border border-dark">
+                    <div class="card-header"><%=sensorData[sensorID[i]].senName %>
+                        <div style="float: right;">
+                            <input id='<%= sensorID[i]+"_checkBox"%>' type="checkbox" data-toggle="toggle" data-on="On"
+                                data-off="off" data-onstyle="success" data-offstyle="danger" data-size="sm"
+                                onchange="sendNewState('<%= sensorID[i]%>')"
+                                <% if(sensorData[sensorID[i]].senOn==true){%> checked
+                                <%}%>>
+                                
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title" style="text-align: center;">Data : <%=sensorData[sensorID[i]].senLastReadValue %></h5> <p class="card-text">IDK A pic here
+                            maybe and some text that marketing can choose</p>
+                        </div>
+                    </div>
+
+
+                    <div
+                        class="card text-white <%= cardColors[i+1] %> mb-3 <%= sensorID[i+1]%> <%= "cat"+sensorData[sensorID[i+1]]["cat"]%> shadow border border-dark">
+                        <div class="card-header"><%=sensorData[sensorID[i+1]].senName %>
+                            <div style="float: right;">
+
+                                <input id='<%= sensorID[i+1]+"_checkBox"%>' type="checkbox" data-toggle="toggle"
+                                    data-on="On" data-off="off" data-onstyle="success" data-offstyle="danger"
+                                    data-size="sm" onchange="sendNewState('<%= sensorID[i+1]%>')"
+                                    <% if(sensorData[sensorID[i+1]].senOn==true){%> checked
+                                    <%}%>>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title" style="text-align: center;">Data : <%=sensorData[sensorID[i+1]].senLastReadValue %></h5> <p class="card-text">IDK A pic here
+                                maybe and some text that marketing can choose</p>
+                            </div>
+                        </div>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
 </body>

@@ -1,12 +1,9 @@
 var express = require('express');
 var app = express();
-var server = require('http').createServer(app);
-var io = require('socket.io')(server);
 var ejs = require('ejs');
 var bodyParser = require('body-parser')
-const uuidv4 = require('uuid/v4');
+const fs = require('fs');
 
-var totalMessages = 0;
 
 app.set('view engine', 'ejs');
 app.use(express.static('public'))
@@ -16,142 +13,131 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 }));
 
 
-var lastWinner = "";
-var lastWinnerScore = 0;
-
-var gameScores = {
-
-}
-
-var highscores = {
-
-}
-
-
-function checkAndAddHighScore(msg) {
-    if (msg["uuid"] == lastWinner) {
-        highscores[msg["data"]] = lastWinnerScore
+let sensorData = {
+    "sen1": {
+        "senName": "Sensor 1",
+        "senOn": true,
+        "senLastReadValue": 5,
+        "cat": 4
+    },
+    "sen2": {
+        "senName": "Sensor 2",
+        "senOn": true,
+        "senLastReadValue": 5,
+        "cat": 1
+    },
+    "sen3": {
+        "senName": "Sensor 3",
+        "senOn": true,
+        "senLastReadValue": 5,
+        "cat": 1
+    },
+    "sen4": {
+        "senName": "Sensor 4",
+        "senOn": true,
+        "senLastReadValue": 5,
+        "cat": 2
+    },
+    "sen5": {
+        "senName": "Sensor 5",
+        "senOn": true,
+        "senLastReadValue": 5,
+        "cat": 2
+    },
+    "sen6": {
+        "senName": "Sensor 6",
+        "senOn": true,
+        "senLastReadValue": 5,
+        "cat": 3
+    },
+    "sen7": {
+        "senName": "Sensor 7",
+        "senOn": true,
+        "senLastReadValue": 5,
+        "cat": 3
+    },
+    "sen8": {
+        "senName": "Sensor 8",
+        "senOn": true,
+        "senLastReadValue": 5,
+        "cat": 4
     }
-    console.log(highscores)
 }
 
-//HELPER FUNCTIONS
 
-function checkHighScore() {
-    console.log("GET GLOBAL LEADER")
-    console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-    console.log(gameScores)
-    if (Object.keys(gameScores).length > 0) {
-        maxValue = 0;
-        winner = ''
-        playerList = Object.keys(io.sockets.clients()['connected'])
-        for (var i = 0; i < playerList.length; i++) {
-            var score = gameScores[playerList[i]].length
-            if (score > maxValue) {
-                maxValue = score;
-                winner = playerList[i];
-            }
-        }
-        console.log(`Winner is ${winner} with a score of ${maxValue}, playerlist ${playerList}`)
-        console.log(playerList.indexOf(winner))
-        if (playerList.indexOf(winner) != -1) {
-            lastWinner = winner;
-            lastWinnerScore = maxValue;
-            io.sockets.clients()['connected'][winner].emit("recvWinFromServer", "")
-        }
-    }
-    gameScores = {
-
-    }
-}
 
 
 app.get('/', function (req, res) {
-    res.render('index');
+    res.render('index', { sensorData: sensorData });
 });
 
-
-app.get('/scores', function (req, res) {
-    res.render('highscores', { highscores: highscores });
+app.get("/getAllSensorInfo", (req, res) => {
+    res.send(sensorData)
 });
 
+app.post("/changeSenState", (req, res) => {
+    sen = req.body.senName
+    sensorData[sen]["senOn"] = !sensorData[sen]["senOn"]
+    var re = sensorData[sen]["senOn"] ? "on" : "off";
+    console.log(`User is setting ${sen} to ${re}`)
+    res.send(sensorData[sen]["senOn"])
+})
 
-app.get('/test/sendAll', function (req, res) {
-    io.emit(emit('recvFromServer', { 'data': 'Server generated event BROADCAST' }));
-    res.send("SENT DATA");
-});
-
-
-app.get('/testApi.html', (req, res) => {
-    res.send(`<html>
-
-    <body style="font-size:44">
-        <form action="http://localhost:3000/api" target="_self" method="POST">
-            <input type="radio" style="height:25px;width:25px" name="action" value="startGame">start game</input><br>
-            <input type="radio" style="height:25px;width:25px" name="action" value="get all clients answers">get all clients answers</input><br>
-            <input type="radio" style="height:25px;width:25px" name="action" value="checkHighScore">Check highscores</input><br>
-            <input type="hidden"  name="token" value="dfrobot_secret_key_12215647878964121487">
-            <input type="submit"  style="height:75px;width:100px" value="Submit" onclick="submitHighScore()">
-    
-        </form>
-    </body>
-    
-    </html>`);
-});
 
 app.post('/api', function (req, res) {
-    console.log(req.body.action)
-    const apiKey = req.body.token;
+    var result = { "msg": "" }
+    const apiKey = req.body.apiKey;
+
     if (apiKey == "dfrobot_secret_key_12215647878964121487") {
         const action = req.body.action;
+        console.log(`Actions recv: ${action}`);
         switch (action) {
-            case 'startGame':
-                io.emit('start game', { 'lengthOfGame': 5 });
-                break;
-            case 'get all clients answers':
-                console.log("HERE!")
-                io.emit("send colors to server");
-                break;
-            case 'checkHighScore':
-                checkHighScore();
+            case 'updateVal':
+                const senID = req.body.senID;
+                const senVal = req.body.senVal;
+                sensorData[senID]["senLastReadValue"] = senVal;
+                result.msg = "Success!"
+                res.send(result)
+                res.end
+                return true
+                break
+            case 'getAllVal':
+                result.msg = (sensorData)
+                res.send(result)
+                res.end
+                return
+                break
+            case 'turnOffAll':
+                for (i in sensorData) {
+                    sensorData[i].senOn = false;
+                }
+                result.msg = (sensorData)
+                res.send(result)
+                res.end
+                return true
+                break
+            case 'turnOnAll':
+                for (i in sensorData) {
+                    sensorData[i].senOn = true;
+                }
+                result.msg = (sensorData)
+                res.send(result)
+                res.end
+                return true
+                break
             default:
                 break;
         }
     }
-    res.redirect("localhost:3000/testApi.html");
+    res.redirect("localhost:8081/testApi");
 
 });
 
-
-
-
-io.on('connection', function (socket) {
-    const localID = socket['id'];
-    console.log(`${localID} user connected`);
-    socket.emit('connect_response', {
-        'data': 'Connected', 'id': localID
-    }
-    );
-
-    socket.on('colorArray', (msg) => {
-        console.log(msg)
-        gameScores[msg['uuid']] = msg['data'];
-    });
-
-    socket.on('userHighScoreSubmit', (msg) => {
-        console.log("!@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-        console.log(msg);
-        checkAndAddHighScore(msg)
-    })
-
-    socket.on('disconnect', function () {
-        io.emit('user disconnected');
-    });
+app.get('/testApi', (req, res) => {
+    res.render('testApi');
 });
 
 
-
-
-server.listen(process.env.PORT || 8081, '0.0.0.0', function () {
+app.listen(process.env.PORT || 8081, '0.0.0.0', function () {
     console.log('app running');
 });

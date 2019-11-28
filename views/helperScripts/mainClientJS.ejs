@@ -1,0 +1,87 @@
+<script type="text/javascript" charset="utf-8">
+    function animateDiv($target) {
+        var newPos = [Math.floor(Math.random() * window.innerHeight), Math.floor(Math.random() * window.innerWidth)];
+        var oldPos = $target.offset();
+        var speed = calcSpeed([oldPos.top, oldPos.left], newPos);
+        $target.animate({
+            top: newPos[0],
+            left: newPos[1]
+        }, speed, function () {
+            animateDiv($target);
+        });
+
+    };
+
+    function calcSpeed(prev, next) {
+        var x = Math.abs(prev[1] - next[1]);
+        var y = Math.abs(prev[0] - next[0]);
+        var greatest = x > y ? x : y;
+        var speed = Math.ceil(greatest / .3);
+        return speed;
+    }
+
+    async function sendNewState(senName) {
+        const url = 'http://localhost:8081/changeSenState';
+        const data = { senName: senName };
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            const json = await response.json();
+            console.log('Success:', JSON.stringify(json));
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    async function updateInfo() {
+        var senIDs = getSenIDs();
+
+
+        const url = 'http://localhost:8081/getAllSensorInfo';
+
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+            });
+            const json = await response.json();
+            //console.log('Success:', JSON.stringify(json));
+            keys = Object.keys(json)
+            keys.forEach(
+                (i) => {
+                    // console.log(json[i]["senOn"])
+                    var copyOfOnChang = $("#" + i.toString() + "_checkBox")[0].onchange;
+                    $("#" + i.toString() + "_checkBox")[0].onchange = ""
+
+                    if (json[i]["senOn"]) {
+                        $("#" + i.toString() + "_checkBox").bootstrapToggle('on')
+                    }
+                    else {
+
+                        $("#" + i.toString() + "_checkBox").bootstrapToggle('off')
+                    }
+                    $("#" + i.toString() + "_checkBox")[0].onchange = copyOfOnChang;
+                    $("." + i.toString())[0].children[1].children[0].innerHTML = "Data : " + json[i]["senLastReadValue"]
+                    // $("."+i.toString()).each(function (index) {
+                    //     console.log(index + ": " + $(this).text());
+                    // });
+                }
+            )
+
+
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    $(document).ready(function () {
+        animateDiv($('.a'));
+        setInterval(updateInfo, 1000);
+    });
+
+</script>

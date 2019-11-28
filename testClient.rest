@@ -1,0 +1,13 @@
+
+POST http://localhost:8081/api HTTP/1.1
+Content-Type: application/json
+
+{ "senID":"sen1", "senVal":"134", "apiKey":"dfrobot_secret_key_12215647878964121487", "action":"updateVal"}
+
+
+
+
+POST http://localhost:8081/api HTTP/1.1
+Content-Type: application/json
+
+{ "senID":"sen2", "senVal":"13", "apiKey":"dfrobot_secret_key_12215647878964121487", "action":"updateVal"}

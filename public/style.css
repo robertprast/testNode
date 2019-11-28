@@ -1,0 +1,31 @@
+body    {overflow-y:scroll;}
+
+button {
+
+    margin-right: 5px;
+    margin-left: 5px;
+
+   
+}
+
+.jumboSpecial{
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+    margin-right: -15px;
+    margin-left: -15px;
+    background-color: #000000;
+    color: #FFFFFF;
+}
+
+
+@media all and (max-width:768px){
+    .specialContainer{
+        margin-bottom: 1rem;
+        margin-top: 1rem;
+        margin-right: 5px;
+        margin-left: 5px;
+        background-color: #000000;
+        color: #FFFFFF;
+    }
+    
+}
