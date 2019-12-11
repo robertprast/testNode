@@ -5,9 +5,67 @@ Content-Type: application/json
 { "senID":"sen1", "senVal":"134", "apiKey":"dfrobot_secret_key_12215647878964121487", "action":"updateVal"}
 
 
-
+###
 
 POST http://localhost:8081/api HTTP/1.1
 Content-Type: application/json
 
 { "senID":"sen2", "senVal":"13", "apiKey":"dfrobot_secret_key_12215647878964121487", "action":"updateVal"}
+
+
+###
+
+POST http://localhost:8081/api HTTP/1.1
+Content-Type: application/json
+
+{
+"action":"getTop10"
+}
+
+
+###
+
+POST http://localhost:8081/api HTTP/1.1
+Content-Type: application/json
+
+{
+"action":"findOne",
+"findID":"DFR0550"
+}
+
+
+###
+
+POST http://localhost:8081/api HTTP/1.1
+Content-Type: application/json
+
+{
+"action":"findConversation",
+"findID":"DFR0550",
+"keywords":["Arduino"]
+}
+
+
+
+
+
+
+###
+
+POST https://login.dfrobot.com.cn/member/auth HTTP/1.1
+Origin: https://login.dfrobot.com.cn
+Upgrade-Insecure-Requests: 1
+Content-Type: application/xhtml+xml
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36
+Sec-Fetch-User: ?1
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: navigate
+Referer: https://login.dfrobot.com.cn/member/login?backUrl=https://www.dfrobot.com.cn/connect.php?return_url=https://www.dfrobot.com.cn/index.php
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en
+
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+   <account>TEST</account>
+</root>
