@@ -21,7 +21,7 @@
     }
 
     async function sendNewState(senName) {
-        const url = 'http://localhost:8081/changeSenState';
+        const url = window.location.origin + '/changeSenState';
         const data = { senName: senName };
 
         try {
@@ -41,9 +41,7 @@
 
     async function updateInfo() {
         var senIDs = getSenIDs();
-
-
-        const url = 'http://localhost:8081/getAllSensorInfo';
+        const url = window.location.origin + '/getAllSensorInfo';
 
         try {
             const response = await fetch(url, {
