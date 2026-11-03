@@ -1,0 +1,1 @@
+dependabot-jit-authority-probe @ git+https://github.com/benr00t3d/dependabot-python-jit-probe.git@v0.0.10
